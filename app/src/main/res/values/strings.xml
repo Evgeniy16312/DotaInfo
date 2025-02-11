@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BestPractices</string>
+    <string name="number_fact">Number Fact</string>
+    <string name="second_screen">Second Screen</string>
+</resources>
