@@ -1,22 +1,30 @@
-package com.example.bestpractices.dev.numberfactscreen
+package com.example.bestpractices.dev.presentation.screen.numberfactscreen
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.bestpractices.dev.MainViewModel
-import com.example.bestpractices.dev.MainViewModelFactory
-import com.example.bestpractices.dev.NumberFactIntent
-import com.example.bestpractices.dev.NumberFactResponse
-import com.example.bestpractices.dev.NumberFactState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bestpractices.dev.domain.model.NumberFact
+import com.example.bestpractices.dev.presentation.viewmodel.MainViewModel
 
 @Composable
-fun NumberFactScreen(viewModel: MainViewModel = viewModel(factory = MainViewModelFactory())) {
+fun NumberFactScreen(viewModel: MainViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
     Column(
@@ -52,7 +60,7 @@ fun LoadingView() {
 }
 
 @Composable
-fun FactView(factResponse: NumberFactResponse) {
+fun FactView(factResponse: NumberFact) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

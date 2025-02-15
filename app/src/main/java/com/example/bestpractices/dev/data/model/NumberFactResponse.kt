@@ -1,4 +1,4 @@
-package com.example.bestpractices.dev
+package com.example.bestpractices.dev.data.model
 
 import com.google.gson.annotations.SerializedName
 
