@@ -88,4 +88,7 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     kapt(libs.javapoet)
+
+    //coil
+    implementation(libs.coil.kt.coil.compose)
 }

@@ -1,16 +1,17 @@
 package com.example.bestpractices.dev.di
 
-
-import com.example.bestpractices.dev.data.api.NumberApiService
-import com.example.bestpractices.dev.data.mapper.NumberFactMapper
-import com.example.bestpractices.dev.data.repository.NumberRepositoryImpl
-import com.example.bestpractices.dev.domain.repository.NumberRepository
+import com.example.bestpractices.dev.data.api.OpenDotaApiService
+import com.example.bestpractices.dev.data.api.RetrofitClient
+import com.example.bestpractices.dev.data.mapper.PlayerMatchMapper
+import com.example.bestpractices.dev.data.mapper.PlayerStatsMapper
+import com.example.bestpractices.dev.data.repository.PlayerMatchRepositoryImpl
+import com.example.bestpractices.dev.data.repository.PlayerStatsRepositoryImpl
+import com.example.bestpractices.dev.domain.repository.PlayerMatchRepository
+import com.example.bestpractices.dev.domain.repository.PlayerStatsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -19,26 +20,27 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideNumberApiService(): NumberApiService {
-        return Retrofit.Builder()
-            .baseUrl("http://numbersapi.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(NumberApiService::class.java)
-    }
+    fun provideOpenDotaApiService(): OpenDotaApiService = RetrofitClient.create()
 
     @Provides
     @Singleton
-    fun provideNumberFactMapper(): NumberFactMapper {
-        return NumberFactMapper()
-    }
+    fun providePlayerStatsMapper(): PlayerStatsMapper = PlayerStatsMapper()
 
     @Provides
     @Singleton
-    fun provideNumberRepository(
-        apiService: NumberApiService,
-        mapper: NumberFactMapper
-    ): NumberRepository {
-        return NumberRepositoryImpl(apiService, mapper)
-    }
+    fun providePlayerMatchMapper(): PlayerMatchMapper = PlayerMatchMapper()
+
+    @Provides
+    @Singleton
+    fun providePlayerStatsRepository(
+        apiService: OpenDotaApiService,
+        mapper: PlayerStatsMapper
+    ): PlayerStatsRepository = PlayerStatsRepositoryImpl(apiService, mapper)
+
+    @Provides
+    @Singleton
+    fun providePlayerMatchRepository(
+        apiService: OpenDotaApiService,
+        mapper: PlayerMatchMapper
+    ): PlayerMatchRepository = PlayerMatchRepositoryImpl(apiService, mapper)
 }

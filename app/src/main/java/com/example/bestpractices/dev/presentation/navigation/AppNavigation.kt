@@ -13,13 +13,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.bestpractices.dev.presentation.screen.numberfactscreen.NumberFactScreen
-import com.example.bestpractices.dev.presentation.screen.secondscreen.SecondScreen
+import com.example.bestpractices.dev.presentation.screen.numberfactscreen.PlayerMatchScreen
+import com.example.bestpractices.dev.presentation.screen.secondscreen.PlayerStatsScreen
+import com.example.bestpractices.dev.presentation.viewmodel.PlayerMatchViewModel
 
 @Composable
 fun AppNavigation() {
@@ -36,11 +38,12 @@ fun AppNavigation() {
             startDestination = Screen.NumberFact.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.NumberFact.route) {
-                NumberFactScreen()
+            composable(Screen.NumberFact.route) { backStackEntry ->
+                val viewModel: PlayerMatchViewModel = hiltViewModel(backStackEntry)
+                PlayerMatchScreen(viewModel = viewModel)
             }
-            composable(Screen.SecondScreen.route) {
-                SecondScreen(id = "test")
+            composable(Screen.PlayerStats.route) {
+                PlayerStatsScreen()
             }
         }
     }
@@ -51,7 +54,7 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
     BottomNavigation {
         val items = listOf(
             Screen.NumberFact to Icons.Default.Home,
-            Screen.SecondScreen to Icons.Default.Favorite
+            Screen.PlayerStats to Icons.Default.Favorite
         )
         items.forEach { (screen, icon) ->
             BottomNavigationItem(
