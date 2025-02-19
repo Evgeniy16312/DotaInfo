@@ -7,7 +7,13 @@ data class PlayerStatsResponse(
     @SerializedName("competitive_rank") val competitiveRank: Int?,
     @SerializedName("rank_tier") val rankTier: Int?,
     @SerializedName("leaderboard_rank") val leaderboardRank: Int?,
-    @SerializedName("profile") val profile: PlayerProfile?
+    @SerializedName("profile") val profile: PlayerProfile?,
+    @SerializedName("steam_level") val steamLevel: Int?,
+    @SerializedName("badges") val badges: Int?,
+    @SerializedName("friends") val friendsCount: Int?,
+    @SerializedName("profile_awards") val profileAwards: Int?,
+    @SerializedName("reviews") val reviews: Int?,
+    @SerializedName("guides") val guides: Int?
 )
 
 data class PlayerProfile(

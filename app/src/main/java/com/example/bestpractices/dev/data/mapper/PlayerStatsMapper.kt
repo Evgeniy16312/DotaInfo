@@ -4,13 +4,24 @@ import com.example.bestpractices.dev.data.model.PlayerStatsResponse
 import com.example.bestpractices.dev.domain.model.PlayerStats
 
 class PlayerStatsMapper {
-
-    fun mapToPlayerStats(playerStatsResponse: PlayerStatsResponse): PlayerStats {
+    fun mapToPlayerStats(response: PlayerStatsResponse): PlayerStats {
         return PlayerStats(
-            accountId = playerStatsResponse.profile?.accountId ?: 0,
-            playerName = playerStatsResponse.profile?.personaname ?: "Unknown",
-            rankTier = playerStatsResponse.rankTier ?: 0,
-            avatarUrl = playerStatsResponse.profile?.avatarFull ?: ""
+            accountId = response.profile?.accountId ?: 0,
+            playerName = response.profile?.personaname ?: "Unknown",
+            realName = response.profile?.name ?: "N/A",
+            avatarUrl = response.profile?.avatarFull ?: "",
+            avatarMediumUrl = response.profile?.avatarMedium ?: "",
+            soloCompetitiveRank = response.soloCompetitiveRank,
+            competitiveRank = response.competitiveRank,
+            leaderboardRank = response.leaderboardRank,
+            lastLogin = response.profile?.lastLogin ?: "Неизвестно",
+            country = response.profile?.locCountryCode ?: "N/A",
+            profileUrl = response.profile?.profileUrl ?: "",
+            steamId = response.profile?.steamId ?: "",
+            isDotaPlusSubscriber = response.profile?.plus ?: false,
+            cheese = response.profile?.cheese ?: 0,
+            isContributor = response.profile?.isContributor ?: false,
+            isSubscriber = response.profile?.isSubscriber ?: false
         )
     }
 }
