@@ -5,13 +5,14 @@ import com.example.bestpractices.dev.data.mapper.PlayerMatchMapper
 import com.example.bestpractices.dev.domain.model.PlayerMatch
 import com.example.bestpractices.dev.domain.repository.PlayerMatchRepository
 
-class PlayerMatchRepositoryImpl (
+class PlayerMatchRepositoryImpl(
     private val apiService: OpenDotaApiService,
     private val mapper: PlayerMatchMapper
-    ) : PlayerMatchRepository {
+) : PlayerMatchRepository {
 
-    override suspend fun getPlayerMatch(accountId: Long): List<PlayerMatch> {
-        val response = apiService.getPlayerMatches(accountId)
+    override suspend fun getPlayerMatch(accountId: Long, page: Int, pageSize: Int): List<PlayerMatch> {
+        val offset = page * pageSize
+        val response = apiService.getPlayerMatches(accountId, limit = pageSize, offset = offset)
         return mapper.mapToPlayerMatch(response)
     }
 }

@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetPlayerMatchUseCase @Inject constructor(
     private val repository: PlayerMatchRepository
 ) {
-    suspend operator fun invoke(accountId: Long): List<PlayerMatch> {
-        return repository.getPlayerMatch(accountId)
+    suspend operator fun invoke(accountId: Long, page: Int, pageSize: Int): List<PlayerMatch> {
+        return repository.getPlayerMatch(accountId, page, pageSize)
     }
 }

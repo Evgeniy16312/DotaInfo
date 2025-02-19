@@ -91,4 +91,7 @@ dependencies {
 
     //coil
     implementation(libs.coil.kt.coil.compose)
+
+
+    implementation(libs.androidx.compose.foundation)
 }
