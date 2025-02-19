@@ -6,22 +6,23 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.bestpractices.dev.presentation.screen.numberfactscreen.PlayerMatchScreen
-import com.example.bestpractices.dev.presentation.screen.secondscreen.PlayerStatsScreen
-import com.example.bestpractices.dev.presentation.viewmodel.PlayerMatchViewModel
+import androidx.navigation.navArgument
+import com.example.bestpractices.dev.presentation.screen.account.AccountScreen
+import com.example.bestpractices.dev.presentation.screen.match.PlayerMatchScreen
+import com.example.bestpractices.dev.presentation.screen.stats.PlayerStatsScreen
 
 @Composable
 fun AppNavigation() {
@@ -30,20 +31,36 @@ fun AppNavigation() {
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController, currentRoute)
+            BottomNavigationBar(navController = navController, currentRoute = currentRoute)
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.NumberFact.route,
+            startDestination = Screen.Account.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.NumberFact.route) { backStackEntry ->
-                val viewModel: PlayerMatchViewModel = hiltViewModel(backStackEntry)
-                PlayerMatchScreen(viewModel = viewModel)
+            composable(Screen.Account.route) {
+                AccountScreen(navController = navController)
             }
-            composable(Screen.PlayerStats.route) {
-                PlayerStatsScreen()
+            composable(
+                route = Screen.PlayerMatch.route + "?accountId={accountId}",
+                arguments = listOf(navArgument("accountId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val accountId = backStackEntry.arguments?.getLong("accountId") ?: run {
+                    navController.popBackStack()
+                    return@composable
+                }
+                PlayerMatchScreen(accountId = accountId)
+            }
+            composable(
+                route = Screen.PlayerStats.route + "?accountId={accountId}",
+                arguments = listOf(navArgument("accountId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val accountId = backStackEntry.arguments?.getLong("accountId") ?: run {
+                    navController.popBackStack()
+                    return@composable
+                }
+                PlayerStatsScreen(accountId = accountId)
             }
         }
     }
@@ -53,19 +70,28 @@ fun AppNavigation() {
 fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
     BottomNavigation {
         val items = listOf(
-            Screen.NumberFact to Icons.Default.Home,
-            Screen.PlayerStats to Icons.Default.Favorite
+            Screen.PlayerMatch to Icons.Default.PlayArrow,
+            Screen.PlayerStats to Icons.Default.Person
         )
+
         items.forEach { (screen, icon) ->
             BottomNavigationItem(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primary),
+                modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                 icon = { Icon(icon, contentDescription = null) },
                 label = { Text(screen.route) },
-                selected = currentRoute == screen.route,
+                selected = currentRoute?.startsWith(screen.route) == true,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId)
+                    val accountId = navController.currentBackStackEntry
+                        ?.arguments?.getLong("accountId")
+
+                    val destination = if (accountId != null) {
+                        "${screen.route}?accountId=$accountId"
+                    } else {
+                        screen.route
+                    }
+
+                    navController.navigate(destination) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
                         launchSingleTop = true
                     }
                 }

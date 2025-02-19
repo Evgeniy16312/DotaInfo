@@ -3,7 +3,7 @@ package com.example.bestpractices.dev.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bestpractices.dev.domain.usecase.GetPlayerMatchUseCase
-import com.example.bestpractices.dev.presentation.screen.numberfactscreen.PlayerMatchState
+import com.example.bestpractices.dev.presentation.screen.match.PlayerMatchState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

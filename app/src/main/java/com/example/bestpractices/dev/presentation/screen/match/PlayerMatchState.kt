@@ -1,4 +1,4 @@
-package com.example.bestpractices.dev.presentation.screen.numberfactscreen
+package com.example.bestpractices.dev.presentation.screen.match
 
 import com.example.bestpractices.dev.domain.model.PlayerMatch
 

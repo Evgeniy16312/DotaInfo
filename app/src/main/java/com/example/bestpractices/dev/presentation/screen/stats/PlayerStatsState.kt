@@ -1,4 +1,4 @@
-package com.example.bestpractices.dev.presentation.screen.secondscreen
+package com.example.bestpractices.dev.presentation.screen.stats
 
 import com.example.bestpractices.dev.domain.model.PlayerStats
 

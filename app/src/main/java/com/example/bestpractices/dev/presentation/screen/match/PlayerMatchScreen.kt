@@ -1,4 +1,4 @@
-package com.example.bestpractices.dev.presentation.screen.numberfactscreen
+package com.example.bestpractices.dev.presentation.screen.match
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,9 +34,15 @@ import com.example.bestpractices.dev.domain.model.PlayerMatch
 import com.example.bestpractices.dev.presentation.viewmodel.PlayerMatchViewModel
 
 @Composable
-fun PlayerMatchScreen(viewModel: PlayerMatchViewModel = hiltViewModel()) {
-    var accountId by remember { mutableStateOf("") }
+fun PlayerMatchScreen(
+    viewModel: PlayerMatchViewModel = hiltViewModel(),
+    accountId: Long
+) {
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(accountId) {
+        viewModel.loadPlayerMatches(accountId)
+    }
 
     Column(
         modifier = Modifier
@@ -44,39 +51,14 @@ fun PlayerMatchScreen(viewModel: PlayerMatchViewModel = hiltViewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // Поле ввода для accountId
-        OutlinedTextField(
-            value = accountId,
-            onValueChange = { accountId = it },
-            label = { Text(text = "Введите ID игрока") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                accountId.toLongOrNull()?.let { id ->
-                    viewModel.loadPlayerMatches(id)
-                }
-            },
-            enabled = accountId.isNotBlank()
-        ) {
-            Text("Загрузить матчи")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         when (val currentState = state) {
-            is PlayerMatchState.Idle -> Text("Введите ID и нажмите 'Загрузить'")
+            is PlayerMatchState.Idle -> Text("Загружаем данные...")
             is PlayerMatchState.Loading -> LoadingView()
             is PlayerMatchState.Success -> MatchListView(currentState.matches)
             is PlayerMatchState.Error -> ErrorView(
                 currentState.message,
                 viewModel,
-                accountId.toLong()
+                accountId
             )
         }
     }
@@ -107,17 +89,6 @@ fun MatchItem(match: PlayerMatch) {
                 text = if (match.isWin) "Victory" else "Defeat",
                 color = if (match.isWin) Color.Green else Color.Red
             )
-        }
-    }
-}
-
-@Composable
-fun IdleView(viewModel: PlayerMatchViewModel, accountId: Long) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Нажмите кнопку, чтобы загрузить матчи", textAlign = TextAlign.Center)
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { viewModel.loadPlayerMatches(accountId) }) {
-            Text("Загрузить")
         }
     }
 }
