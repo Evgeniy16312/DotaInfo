@@ -1,10 +1,11 @@
 package com.example.bestpractices.dev.presentation.screen.match
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -75,6 +78,8 @@ fun PlayerMatchScreen(
 fun MatchListView(viewModel: PlayerMatchViewModel, accountId: Long) {
     val state by viewModel.state.collectAsState()
     val matches = (state as? PlayerMatchState.Success)?.matches.orEmpty()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+
     val refreshState = rememberPullRefreshState(
         refreshing = state is PlayerMatchState.Loading,
         onRefresh = { viewModel.loadPlayerMatches(accountId, refresh = true) }
@@ -88,13 +93,17 @@ fun MatchListView(viewModel: PlayerMatchViewModel, accountId: Long) {
             .map { it.lastOrNull()?.index ?: 0 }
             .distinctUntilChanged()
             .collect { lastVisibleIndex ->
-                if (lastVisibleIndex >= matches.size - 5) { // Подгружать за 5 элементов до конца
+                if (lastVisibleIndex >= matches.size - 5 && !isLoadingMore) {
                     viewModel.loadMoreMatches(accountId)
                 }
             }
     }
 
-    Box(modifier = Modifier.fillMaxSize().pullRefresh(refreshState)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(refreshState)
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
@@ -106,8 +115,8 @@ fun MatchListView(viewModel: PlayerMatchViewModel, accountId: Long) {
             }
 
             // Показать индикатор загрузки при подгрузке новых данных
-            item {
-                if (viewModel.isLoadingMore()) {
+            if (isLoadingMore) {
+                item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
@@ -126,23 +135,53 @@ fun MatchListView(viewModel: PlayerMatchViewModel, accountId: Long) {
 
 @Composable
 fun MatchItem(match: PlayerMatch) {
+    val resultColor = if (match.isWin) Color(0xFF4CAF50) else Color(0xFFF44336)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Match ID: ${match.matchId}", fontWeight = FontWeight.Bold)
-            Text(text = "Hero ID: ${match.heroId}")
-            Text(text = "Kills: ${match.kills}, Deaths: ${match.deaths}, Assists: ${match.assists}")
-            Text(text = "Duration: ${match.duration / 60} min")
-            Text(
-                text = if (match.isWin) "Victory" else "Defeat",
-                color = if (match.isWin) Color.Green else Color.Red
-            )
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(resultColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (match.isWin) "Victory" else "Defeat",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Match ID: ${match.matchId}", fontWeight = FontWeight.Bold)
+                Text(text = "Hero ID: ${match.heroId}")
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Kills: ${match.kills}")
+                    Text(text = "Deaths: ${match.deaths}")
+                    Text(text = "Assists: ${match.assists}")
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(text = "Duration: ${match.duration / 60} min")
+            }
         }
     }
 }
+
 
 @Composable
 fun LoadingView() {

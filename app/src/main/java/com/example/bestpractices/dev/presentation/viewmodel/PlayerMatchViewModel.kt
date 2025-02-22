@@ -2,7 +2,6 @@ package com.example.bestpractices.dev.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bestpractices.dev.domain.model.PlayerMatch
 import com.example.bestpractices.dev.domain.usecase.GetPlayerMatchUseCase
 import com.example.bestpractices.dev.presentation.screen.match.PlayerMatchState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,9 +19,11 @@ class PlayerMatchViewModel @Inject constructor(
     private val _state = MutableStateFlow<PlayerMatchState>(PlayerMatchState.Idle)
     val state: StateFlow<PlayerMatchState> = _state.asStateFlow()
 
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+
     private var currentPage = 0
     private var isLastPage = false
-    private var isLoadingMore = false
 
     fun loadPlayerMatches(accountId: Long, refresh: Boolean = false) {
         viewModelScope.launch {
@@ -33,17 +34,16 @@ class PlayerMatchViewModel @Inject constructor(
             }
 
             try {
-                val matches = getPlayerMatchUseCase(accountId, page = 0, pageSize = 20)
+                val matches = getPlayerMatchUseCase(accountId, page = currentPage, pageSize = 20)
+                val currentMatches =
+                    if (refresh) emptyList() else (state.value as? PlayerMatchState.Success)?.matches.orEmpty()
 
-                val currentMatches = (state.value as? PlayerMatchState.Success)?.matches.orEmpty()
+                _state.value = PlayerMatchState.Success(currentMatches + matches)
+                currentPage++
 
-                if (refresh && matches == currentMatches) {
-                    return@launch // Выходим из функции, если список не изменился
+                if (matches.size < 20) {
+                    isLastPage = true
                 }
-
-                _state.value = PlayerMatchState.Success(matches)
-                currentPage = 1 // Сбрасываем страницу после успешного обновления
-
             } catch (e: Exception) {
                 _state.value = PlayerMatchState.Error(e.localizedMessage ?: "Unknown error")
             }
@@ -51,9 +51,9 @@ class PlayerMatchViewModel @Inject constructor(
     }
 
     fun loadMoreMatches(accountId: Long) {
-        if (isLoadingMore || isLastPage) return
+        if (_isLoadingMore.value || isLastPage) return
 
-        isLoadingMore = true
+        _isLoadingMore.value = true
         viewModelScope.launch {
             try {
                 val matches = getPlayerMatchUseCase(accountId, page = currentPage, pageSize = 20)
@@ -66,11 +66,10 @@ class PlayerMatchViewModel @Inject constructor(
                     currentPage++
                 }
             } catch (e: Exception) {
-                // Ошибку игнорируем, не сбрасываем основной список
+                _state.value = PlayerMatchState.Error(e.localizedMessage ?: "Unknown error")
+            } finally {
+                _isLoadingMore.value = false
             }
-            isLoadingMore = false
         }
     }
-
-    fun isLoadingMore(): Boolean = isLoadingMore
 }

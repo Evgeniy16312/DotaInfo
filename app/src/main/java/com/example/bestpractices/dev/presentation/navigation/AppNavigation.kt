@@ -70,8 +70,8 @@ fun AppNavigation() {
 fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
     BottomNavigation {
         val items = listOf(
-            Screen.PlayerMatch to Icons.Default.PlayArrow,
-            Screen.PlayerStats to Icons.Default.Person
+            Screen.PlayerStats to Icons.Default.Person,
+            Screen.PlayerMatch to Icons.Default.PlayArrow
         )
 
         items.forEach { (screen, icon) ->

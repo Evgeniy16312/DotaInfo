@@ -94,4 +94,9 @@ dependencies {
 
 
     implementation(libs.androidx.compose.foundation)
+
+    implementation(libs.room.runtime)
+    //noinspection KaptUsageInsteadOfKsp
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
 }
