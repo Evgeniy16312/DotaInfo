@@ -56,6 +56,7 @@ fun PlayerMatchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.DarkGray)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top

@@ -5,10 +5,13 @@ import com.example.bestpractices.dev.data.api.OpenDotaApiService
 import com.example.bestpractices.dev.data.api.RetrofitClient
 import com.example.bestpractices.dev.data.database.AppDatabase
 import com.example.bestpractices.dev.data.database.PlayerMatchDao
+import com.example.bestpractices.dev.data.mapper.HeroesMapper
 import com.example.bestpractices.dev.data.mapper.PlayerMatchMapper
 import com.example.bestpractices.dev.data.mapper.PlayerStatsMapper
+import com.example.bestpractices.dev.data.repository.HeroesRepositoryImpl
 import com.example.bestpractices.dev.data.repository.PlayerMatchRepositoryImpl
 import com.example.bestpractices.dev.data.repository.PlayerStatsRepositoryImpl
+import com.example.bestpractices.dev.domain.repository.HeroesRepository
 import com.example.bestpractices.dev.domain.repository.PlayerMatchRepository
 import com.example.bestpractices.dev.domain.repository.PlayerStatsRepository
 import dagger.Module
@@ -36,10 +39,21 @@ object DataModule {
 
     @Provides
     @Singleton
+    fun provideHeroesMapper(): HeroesMapper = HeroesMapper()
+
+    @Provides
+    @Singleton
     fun providePlayerStatsRepository(
         apiService: OpenDotaApiService,
         mapper: PlayerStatsMapper
     ): PlayerStatsRepository = PlayerStatsRepositoryImpl(apiService, mapper)
+
+    @Provides
+    @Singleton
+    fun provideHeroesRepository(
+        apiService: OpenDotaApiService,
+        mapper: HeroesMapper
+    ): HeroesRepository = HeroesRepositoryImpl(apiService, mapper)
 
     @Provides
     @Singleton
