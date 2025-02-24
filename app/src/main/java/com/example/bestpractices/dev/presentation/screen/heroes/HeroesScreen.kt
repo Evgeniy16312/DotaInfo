@@ -1,11 +1,13 @@
 package com.example.bestpractices.dev.presentation.screen.heroes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -13,7 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,8 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -34,6 +42,7 @@ import com.example.bestpractices.dev.presentation.viewmodel.HeroesViewModel
 @Composable
 fun HeroesScreen(
     navController: NavController,
+    accountId: Long?,
     viewModel: HeroesViewModel = hiltViewModel()
 ) {
     val heroesState by viewModel.heroesState
@@ -43,8 +52,9 @@ fun HeroesScreen(
     }
 
     when (val state = heroesState) {
-        is HeroesState.Idle -> {
+        is HeroesState.Idle -> { /* Начальное состояние */
         }
+
         is HeroesState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -53,19 +63,30 @@ fun HeroesScreen(
                 CircularProgressIndicator()
             }
         }
+
         is HeroesState.Success -> {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
                 items(state.heroes) { hero ->
                     HeroItem(hero = hero)
                 }
             }
         }
+
         is HeroesState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Error: ${state.message}")
+                Text(
+                    text = "Ошибка: ${state.message}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
@@ -73,37 +94,75 @@ fun HeroesScreen(
 
 @Composable
 fun HeroItem(hero: Heroes) {
-    Card(
+    ElevatedCard(
+        onClick = { /* добавить навигацию к деталям героя */ },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .shadow(elevation = 4.dp)
+            .padding(vertical = 8.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = hero.logo,
-                contentDescription = null,
+                contentDescription = hero.localizedName ?: "Изображение героя",
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = hero.localizedName ?: "Unknown",
-                    fontWeight = FontWeight.Bold
+                    text = hero.localizedName ?: "Неизвестный герой",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(text = "Primary Attribute: ${hero.primaryAttr}")
-                Text(text = "Attack Type: ${hero.attackType}")
-                Text(text = "Roles: ${hero.roles.joinToString(", ")}")
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Атрибут: ${hero.primaryAttr}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Тип атаки: ${hero.attackType}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "Роли: ${hero.roles.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HeroItemPreview() {
+    MaterialTheme {
+        HeroItem(
+            hero = Heroes(
+                id = 1,
+                name = "Axe",
+                localizedName = "Axe",
+                primaryAttr = "Strength",
+                attackType = "Melee",
+                roles = listOf("Initiator", "Durable"),
+                logo = "https://api.opendota.com/apps/dota2/images/heroes/axe_full.png"
+            )
+        )
     }
 }

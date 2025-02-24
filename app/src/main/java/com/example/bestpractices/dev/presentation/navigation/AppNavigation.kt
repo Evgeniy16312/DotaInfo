@@ -72,8 +72,16 @@ fun AppNavigation() {
                 }
                 PlayerStatsScreen(accountId = accountId)
             }
-            composable(Screen.Heroes.route) {
-                HeroesScreen(navController = navController)
+            composable(
+                route = Screen.Heroes.route + "?accountId={accountId}",
+                arguments = listOf(navArgument("accountId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val accountId = backStackEntry.arguments?.getLong("accountId") ?: run {
+                    navController.popBackStack()
+                    return@composable
+                }
+
+                HeroesScreen(navController = navController, accountId = accountId)
             }
         }
     }
@@ -114,6 +122,8 @@ fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
                 onClick = {
                     val accountId = navController.currentBackStackEntry
                         ?.arguments?.getLong("accountId")
+                        ?: navController.previousBackStackEntry
+                            ?.arguments?.getLong("accountId")
 
                     val destination = if (accountId != null) {
                         "${screen.route}?accountId=$accountId"
