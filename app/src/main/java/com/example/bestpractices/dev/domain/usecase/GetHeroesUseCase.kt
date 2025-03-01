@@ -10,4 +10,8 @@ class GetHeroesUseCase @Inject constructor(
     suspend operator fun invoke(): List<Heroes> {
         return repository.getHeroes()
     }
+
+    suspend fun updateHeroes(): List<Heroes> {
+        return repository.updateHeroes()
+    }
 }

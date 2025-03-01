@@ -4,11 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.bestpractices.dev.data.database.hero.HeroDao
+import com.example.bestpractices.dev.data.database.hero.HeroEntity
+import com.example.bestpractices.dev.data.database.matchs.PlayerMatchDao
+import com.example.bestpractices.dev.data.database.matchs.PlayerMatchEntity
 
-@Database(entities = [PlayerMatchEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        PlayerMatchEntity::class,
+        HeroEntity::class],
+    version = 2,
+    exportSchema = false,
+)
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun playerMatchDao(): PlayerMatchDao
+    abstract fun heroDao(): HeroDao
 
     companion object {
         @Volatile
@@ -20,7 +30,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                    // Для простоты миграции при изменении версии
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

@@ -4,7 +4,8 @@ import android.content.Context
 import com.example.bestpractices.dev.data.api.OpenDotaApiService
 import com.example.bestpractices.dev.data.api.RetrofitClient
 import com.example.bestpractices.dev.data.database.AppDatabase
-import com.example.bestpractices.dev.data.database.PlayerMatchDao
+import com.example.bestpractices.dev.data.database.hero.HeroDao
+import com.example.bestpractices.dev.data.database.matchs.PlayerMatchDao
 import com.example.bestpractices.dev.data.mapper.HeroesMapper
 import com.example.bestpractices.dev.data.mapper.PlayerMatchMapper
 import com.example.bestpractices.dev.data.mapper.PlayerStatsMapper
@@ -50,13 +51,6 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideHeroesRepository(
-        apiService: OpenDotaApiService,
-        mapper: HeroesMapper
-    ): HeroesRepository = HeroesRepositoryImpl(apiService, mapper)
-
-    @Provides
-    @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return AppDatabase.getDatabase(context)
     }
@@ -76,4 +70,18 @@ object DataModule {
     ): PlayerMatchRepository {
         return PlayerMatchRepositoryImpl(apiService, mapper, playerMatchDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideHeroDao(database: AppDatabase): HeroDao {
+        return database.heroDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHeroesRepository(
+        apiService: OpenDotaApiService,
+        heroDao: HeroDao,
+        mapper: HeroesMapper
+    ): HeroesRepository = HeroesRepositoryImpl(apiService, heroDao, mapper)
 }

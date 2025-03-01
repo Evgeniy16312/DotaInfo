@@ -1,6 +1,6 @@
 package com.example.bestpractices.dev.data.mapper
 
-import com.example.bestpractices.dev.data.database.PlayerMatchEntity
+import com.example.bestpractices.dev.data.database.matchs.PlayerMatchEntity
 import com.example.bestpractices.dev.data.model.PlayerMatchResponse
 import com.example.bestpractices.dev.domain.model.PlayerMatch
 

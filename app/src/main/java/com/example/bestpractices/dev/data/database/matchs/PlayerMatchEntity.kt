@@ -1,4 +1,4 @@
-package com.example.bestpractices.dev.data.database
+package com.example.bestpractices.dev.data.database.matchs
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

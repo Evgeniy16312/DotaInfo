@@ -1,7 +1,7 @@
 package com.example.bestpractices.dev.data.repository
 
 import com.example.bestpractices.dev.data.api.OpenDotaApiService
-import com.example.bestpractices.dev.data.database.PlayerMatchDao
+import com.example.bestpractices.dev.data.database.matchs.PlayerMatchDao
 import com.example.bestpractices.dev.data.mapper.PlayerMatchMapper
 import com.example.bestpractices.dev.data.mapper.toDomain
 import com.example.bestpractices.dev.data.mapper.toEntity

@@ -1,5 +1,6 @@
 package com.example.bestpractices.dev.presentation.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -24,8 +25,20 @@ class HeroesViewModel @Inject constructor(
             try {
                 val heroes = getHeroesUseCase()
                 _heroesState.value = HeroesState.Success(heroes)
+                updateHeroesIfNeeded()
             } catch (e: Exception) {
                 _heroesState.value = HeroesState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    private fun updateHeroesIfNeeded() {
+        viewModelScope.launch {
+            try {
+                val updatedHeroes = getHeroesUseCase.updateHeroes()
+                _heroesState.value = HeroesState.Success(updatedHeroes)
+            } catch (e: Exception) {
+                Log.e("updateHeroesIfNeeded", e.message.orEmpty())
             }
         }
     }
