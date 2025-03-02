@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,16 +27,26 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bestpractices.R
+import com.example.bestpractices.dev.presentation.screen.PreferencesManager
 import com.example.bestpractices.dev.presentation.screen.account.AccountScreen
 import com.example.bestpractices.dev.presentation.screen.heroes.HeroesScreen
 import com.example.bestpractices.dev.presentation.screen.match.PlayerMatchScreen
 import com.example.bestpractices.dev.presentation.screen.stats.PlayerStatsScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(preferencesManager: PreferencesManager) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
+
+    // Проверяем сохраненный Steam ID и выбираем стартовую точку
+    val startDestination = remember {
+        if (preferencesManager.getSteamId() != null) {
+            Screen.PlayerStats.route + "?accountId=${preferencesManager.getSteamId()}"
+        } else {
+            Screen.Account.route
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -46,11 +57,11 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Account.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Account.route) {
-                AccountScreen(navController = navController)
+                AccountScreen(navController = navController, preferencesManager = preferencesManager)
             }
             composable(
                 route = Screen.PlayerMatch.route + "?accountId={accountId}",
@@ -70,7 +81,11 @@ fun AppNavigation() {
                     navController.popBackStack()
                     return@composable
                 }
-                PlayerStatsScreen(accountId = accountId)
+                PlayerStatsScreen(
+                    navController = navController,
+                    accountId = accountId,
+                    preferencesManager = preferencesManager
+                )
             }
             composable(
                 route = Screen.Heroes.route + "?accountId={accountId}",
@@ -80,7 +95,6 @@ fun AppNavigation() {
                     navController.popBackStack()
                     return@composable
                 }
-
                 HeroesScreen(navController = navController, accountId = accountId)
             }
         }

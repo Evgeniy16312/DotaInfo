@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,12 +34,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.bestpractices.R
 import com.example.bestpractices.dev.presentation.navigation.Screen
+import com.example.bestpractices.dev.presentation.screen.PreferencesManager
 
 @Composable
 fun AccountScreen(
-    navController: NavController
+    navController: NavController,
+    preferencesManager: PreferencesManager
 ) {
     var accountId by remember { mutableStateOf("") }
+
+    // Проверяем сохраненный ID при запуске
+    LaunchedEffect(Unit) {
+        preferencesManager.getSteamId()?.let { savedId ->
+            navController.navigate(Screen.PlayerStats.route + "?accountId=$savedId") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -89,7 +101,10 @@ fun AccountScreen(
             Button(
                 onClick = {
                     accountId.toLongOrNull()?.let { id ->
-                        navController.navigate(Screen.PlayerStats.route + "?accountId=$id")
+                        preferencesManager.saveSteamId(id) // Сохраняем ID
+                        navController.navigate(Screen.PlayerStats.route + "?accountId=$id") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
                     }
                 },
                 enabled = accountId.isNotBlank(),
@@ -111,5 +126,3 @@ fun AccountScreen(
         }
     }
 }
-
-

@@ -15,6 +15,7 @@ import com.example.bestpractices.dev.data.repository.PlayerStatsRepositoryImpl
 import com.example.bestpractices.dev.domain.repository.HeroesRepository
 import com.example.bestpractices.dev.domain.repository.PlayerMatchRepository
 import com.example.bestpractices.dev.domain.repository.PlayerStatsRepository
+import com.example.bestpractices.dev.presentation.screen.PreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +26,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
+
+    @Provides
+    @Singleton
+    fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
+        return PreferencesManager(context)
+    }
 
     @Provides
     @Singleton

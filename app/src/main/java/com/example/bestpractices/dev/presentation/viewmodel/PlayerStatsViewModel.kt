@@ -15,7 +15,7 @@ class PlayerStatsViewModel @Inject constructor(
     private val getPlayerStatsUseCase: GetPlayerStatsUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<PlayerStatsState>(PlayerStatsState.Idle)
+    private val _state = MutableStateFlow<PlayerStatsState>(PlayerStatsState.Loading)
     val state: StateFlow<PlayerStatsState> = _state
 
     fun fetchPlayerStats(accountId: Long) {
